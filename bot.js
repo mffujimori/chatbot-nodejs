@@ -21,21 +21,36 @@ const cardapio = `
 2. 🍟 *Batata Frita* - R$8,00
 
 `;
-var pedidos = {};
 
-// Objeto para armazenar o estado de cada usuário
+const msg = 
+`
+✨🍕 *😋 Hummm... Fome de quê?* 😋🍕✨
+
+Olá! 👋 Em que posso te ajudar hoje?
+
+🔥 *Confira nosso delicioso cardápio AGORA:* 🔥
+👉 [https://www.youtube.com/shorts/Uh6cl7QX_Z0](https://www.youtube.com/shorts/Uh6cl7QX_Z0) 👈
+
+😋 *Já escolheu suas delícias?*
+
+➡️ Digite *1* para *REALIZAR SEU PEDIDO!*
+➡️ Digite *2* para *CONSULTAR SEUS PEDIDOS*
+➡️ Digite *3* para *ENCERRAR A CONVERSA*
+
+Estamos ansiosos para te servir o melhor! 😉
+
+`
+
 let userState = {};
 
-// Quando uma nova mensagem é recebida
+var pedidos = {};
+
 client.on('message', async (message) => {
     const { from, body } = message;
 
     // Verifica se o usuário já iniciou a interação ou não
     if (!userState[from]) {
-        // Se o usuário ainda não interagiu, envia a mensagem inicial
-        await client.sendMessage(from, 'Olá! Como posso te ajudar?');
-        await client.sendMessage(from, 'segue o link do nosso cardapio! https://www.youtube.com/shorts/Uh6cl7QX_Z0');
-        await client.sendMessage(from, 'Deseja realizar um novo pedido? \n1 - Sim \n2- Consultar pedidos \n3- Encerrar conversa');
+        await client.sendMessage(from, msg);
         userState[from] = { step: 1 };
     }else if (userState[from].step === 1) {
         handleResponse1(from, body);
@@ -61,7 +76,7 @@ const handleResponse1 = async (chatId, response) => {
         //userState[chatId] = { step: 3 };
     } else if (response === '3') {
         await client.sendMessage(chatId, 'Conversa encerrada! Obrigado pelo contato 😊');
-        delete userState[chatId]; // limpa estado para caso ele volte depois
+        delete userState[chatId]; // limpa estado para caso o usuario volte depois
     } else {
         await client.sendMessage(chatId, 'Opção inválida! Responda com 1 para "Realizar pedido", 2 para "Consultar pedido" ou 3 para "Encerrar conversa"!.');
     }
