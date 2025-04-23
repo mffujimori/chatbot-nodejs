@@ -35,10 +35,9 @@ client.on('message', async (message) => {
         // Se o usuário ainda não interagiu, envia a mensagem inicial
         await client.sendMessage(from, 'Olá! Como posso te ajudar?');
         await client.sendMessage(from, 'segue o link do nosso cardapio! https://www.youtube.com/shorts/Uh6cl7QX_Z0');
-        await client.sendMessage(from, 'Deseja reaizar um pedido? 1 - Sim 2- nao');
-        userState[from] = { step: 1 }; // Define o estado do usuário como o primeiro passo
-    
-    } else if (userState[from].step === 1) {
+        await client.sendMessage(from, 'Deseja realizar um novo pedido? \n1 - Sim \n2- Consultar pedidos \n3- Encerrar conversa');
+        userState[from] = { step: 1 };
+    }else if (userState[from].step === 1) {
         handleResponse1(from, body);
     }else if (userState[from].step === 2) {
         handleResponse2(from, body);
@@ -51,8 +50,6 @@ client.on('message', async (message) => {
 });
 
 
-
-// Função para lidar com as respostas do usuário
 const handleResponse1 = async (chatId, response) => {
     if (response === '1') {
         await client.sendMessage(chatId, 'Vamos enviar o cardapio!');
@@ -60,53 +57,60 @@ const handleResponse1 = async (chatId, response) => {
         userState[chatId] = {step: 2};
     } else if (response === '2') {
         await client.sendMessage(chatId, 'Você escolheu consultar pedidos!');
-        userState[chatId] = { step: 3 };
+        await handleResponse4(chatId); //agora executa direto pelo handle 1
+        //userState[chatId] = { step: 3 };
+    } else if (response === '3') {
+        await client.sendMessage(chatId, 'Conversa encerrada! Obrigado pelo contato 😊');
+        delete userState[chatId]; // limpa estado para caso ele volte depois
     } else {
-        await client.sendMessage(chatId, 'Opção inválida! Responda com 1 para "Realizar pedido", 2 para "Consultar pedido"!.');
+        await client.sendMessage(chatId, 'Opção inválida! Responda com 1 para "Realizar pedido", 2 para "Consultar pedido" ou 3 para "Encerrar conversa"!.');
     }
 
 };
 
 const handleResponse2 = async (chatId, response) => {
+    if (!pedidos[chatId]) {
+        pedidos[chatId] = [];
+    }
+
     switch(response){
         case '1':
-            await client.sendMessage(chatId, 'Voce escolheu o Hamburguer classico!');
-            pedidos.push = { item: 'Hambúrguer Clássico', price: 15.00 };
-        break;
-        case '2':
-            await client.sendMessage(chatId, 'Voce escolheu a batata frita!');
-            pedidos[chatId].push = { item: 'Batata Frita', price: 8.00};
-        break;
-        default:
-            await client.sendMessage(chatId, 'Opcao invalida, tente 1 ou 2!');
+            await client.sendMessage(chatId, 'Você escolheu o Hambúrguer Clássico!');
+            pedidos[chatId].push({ item: 'Hambúrguer Clássico', price: 15.00 });
             break;
-    };
-    delete userState[chatId];
+        case '2':
+            await client.sendMessage(chatId, 'Você escolheu a Batata Frita!');
+            pedidos[chatId].push({ item: 'Batata Frita', price: 8.00 });
+            break;
+        default:
+            await client.sendMessage(chatId, 'Opção inválida, tente 1 ou 2!');
+            return;
+    }
+
+    await handleResponse3(chatId);// agora ele não deleta o userstate, mantendo o fluxo
 };
 
 const handleResponse3 = async (chatId, response) => {
-    if(response === '2'){
-        await client.sendMessage(chatId, 'Deseja realizar pedido?');
-        await client.sendMessage(chatId,'https://www.youtube.com/shorts/Uh6cl7QX_Z0')
-    }
+    await client.sendMessage(chatId, 'Deseja fazer outro pedido ou consultar seus pedidos?');
+    await client.sendMessage(chatId, '1 - Fazer novo pedido\n2 - Consultar pedidos\n3 - Encerrar conversa');
+    userState[chatId] = { step: 1 }; // volta pro menu principal aproveitando as escolhas 
 };
 
 
-const handleResponse4 = async (chatId, response) => {
-    // Verifica se o usuário já tem um pedido registrado
-    if (pedidos[chatId]) {
-        const pedido = pedidos[chatId];
-        await client.sendMessage(chatId, `Seu pedido é: \n\nItem: ${pedidos.item}\nPreço: R$${pedidos.price.toFixed(2)}`);
-        await pedidos.array.forEach((pedidos, index) => {
-            console.log(`Pedidos ${index + 1}: ${pedidos.item} - R$${pedidos.price.tofixed(2)}`);
+const handleResponse4 = async (chatId) => {
+    if (pedidos[chatId] && pedidos[chatId].length > 0) {
+        let resposta = 'Seus pedidos são:\n\n';
+
+        pedidos[chatId].forEach((pedido, index) => {
+            resposta += `Pedido ${index + 1}:\nItem: ${pedido.item}\nPreço: R$${pedido.price.toFixed(2)}\n\n`;
         });
+
+        await client.sendMessage(chatId, resposta);
     } else {
         await client.sendMessage(chatId, 'Você ainda não fez um pedido!');
     }
 
-    // Após consultar, deleta o estado do usuário para permitir nova interação
-    delete userState[chatId];
+    await handleResponse3(chatId);// agora ele não deleta o userstate, mantendo o fluxo
 };
 
-// Inicializa o cliente do WhatsApp
 client.initialize();
