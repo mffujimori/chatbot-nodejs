@@ -29,7 +29,7 @@ const msg =
 Olá! 👋 Em que posso te ajudar hoje?
 
 🔥 *Confira nosso delicioso cardápio AGORA:* 🔥
-👉 [https://www.youtube.com/shorts/Uh6cl7QX_Z0](https://www.youtube.com/shorts/Uh6cl7QX_Z0) 👈
+👉 [https://drive.google.com/file/d/1wYoDbR5YFoEZlZznT675AaF_GCEku7RF/view] 👈
 
 😋 *Já escolheu suas delícias?*
 
@@ -77,6 +77,7 @@ const handleResponse1 = async (chatId, response) => {
     } else if (response === '3') {
         await client.sendMessage(chatId, 'Conversa encerrada! Obrigado pelo contato 😊');
         delete userState[chatId]; // limpa estado para caso o usuario volte depois
+        pedidos[chatId] = [];
     } else {
         await client.sendMessage(chatId, 'Opção inválida! Responda com 1 para "Realizar pedido", 2 para "Consultar pedido" ou 3 para "Encerrar conversa"!.');
     }
@@ -115,12 +116,15 @@ const handleResponse3 = async (chatId, response) => {
 const handleResponse4 = async (chatId) => {
     if (pedidos[chatId] && pedidos[chatId].length > 0) {
         let resposta = 'Seus pedidos são:\n\n';
+        let total = 0;
 
         pedidos[chatId].forEach((pedido, index) => {
             resposta += `Pedido ${index + 1}:\nItem: ${pedido.item}\nPreço: R$${pedido.price.toFixed(2)}\n\n`;
+            total += pedido.price;
         });
 
         await client.sendMessage(chatId, resposta);
+        await client.sendMessage(chatId, `Valor Total: R$${total.toFixed(2)}`);
     } else {
         await client.sendMessage(chatId, 'Você ainda não fez um pedido!');
     }
