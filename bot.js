@@ -15,10 +15,34 @@ client.on('ready', () => {
 });
 
 const cardapio = `
-🍕 *Escolha seu item:*
+🍽️ *CARDÁPIO - SABOR CASEIRO*  
+🕰️ *Almoço das 11:30 às 14:30*  
 
-1. 🍔 *Hambúrguer Clássico* - R$15,00
-2. 🍟 *Batata Frita* - R$8,00
+🥘 *Pratos do Dia:*  
+1️⃣ *Picadinho* — R$ 40,00  
+2️⃣ *Virado à Paulista* — R$ 40,00  
+3️⃣ *Filé de Carne à Parmegiana* — R$ 40,00  
+4️⃣ *Filé de Frango à Parmegiana* — R$ 40,00  
+5️⃣ *Frango Assado* — R$ 37,00  
+6️⃣ *Frango ao Molho* — R$ 37,00  
+7️⃣ *Rabada* — R$ 40,00  
+8️⃣ *Peixe Tilápia* — R$ 37,00  
+9️⃣ *Peixe Merluza* — R$ 37,00  
+
+🍛 *Feijoada (diversos tamanhos):*  
+🔟 *P (Pequena)* — R$ 55,00  
+1️⃣1️⃣ *M (Média)* — R$ 70,00  
+1️⃣2️⃣ *G (Grande)* — R$ 95,00  
+1️⃣3️⃣ *GG (Família)* — R$ 125,00  
+
+🍳 *Todos os Dias:*  
+1️⃣4️⃣ *Contra Filé* — R$ 45,00  
+1️⃣5️⃣ *Filé de Frango* — R$ 40,00  
+1️⃣6️⃣ *Calabresa* — R$ 37,00  
+1️⃣7️⃣ *Omelete* — R$ 37,00  
+
+💬 *Digite *APENAS* o número do prato desejado para fazer seu pedido!*  
+📍 *Sabor Caseiro – comida feita com amor!*
 
 `;
 
@@ -89,21 +113,37 @@ const handleResponse2 = async (chatId, response) => {
         pedidos[chatId] = [];
     }
 
-    switch(response){
-        case '1':
-            await client.sendMessage(chatId, 'Você escolheu o Hambúrguer Clássico!');
-            pedidos[chatId].push({ item: 'Hambúrguer Clássico', price: 15.00 });
-            break;
-        case '2':
-            await client.sendMessage(chatId, 'Você escolheu a Batata Frita!');
-            pedidos[chatId].push({ item: 'Batata Frita', price: 8.00 });
-            break;
-        default:
-            await client.sendMessage(chatId, 'Opção inválida, tente 1 ou 2!');
-            return;
+    const cardapio = {
+        '1': { item: 'Picadinho', price: 40.00 },
+        '2': { item: 'Virado à Paulista', price: 40.00 },
+        '3': { item: 'Filé de Carne à Parmegiana', price: 40.00 },
+        '4': { item: 'Filé de Frango à Parmegiana', price: 40.00 },
+        '5': { item: 'Frango Assado', price: 37.00 },
+        '6': { item: 'Frango ao Molho', price: 37.00 },
+        '7': { item: 'Rabada', price: 40.00 },
+        '8': { item: 'Peixe Tilápia', price: 37.00 },
+        '9': { item: 'Peixe Merluza', price: 37.00 },
+        '10': { item: 'Feijoada (P)', price: 55.00 },
+        '11': { item: 'Feijoada (M)', price: 70.00 },
+        '12': { item: 'Feijoada (G)', price: 95.00 },
+        '13': { item: 'Feijoada (GG)', price: 125.00 },
+        '14': { item: 'Contra Filé', price: 45.00 },
+        '15': { item: 'Filé de Frango', price: 40.00 },
+        '16': { item: 'Calabresa', price: 37.00 },
+        '17': { item: 'Omelete', price: 37.00 }
+    };
+
+    const pedido = cardapio[response];
+
+    if (pedido) {
+        await client.sendMessage(chatId, `✅ Você escolheu: *${pedido.item}* — R$ ${pedido.price.toFixed(2)}`);
+        pedidos[chatId].push(pedido);
+    } else {
+        await client.sendMessage(chatId, '❌ Opção inválida, por favor digite um número de 1 a 17.');
+        return;
     }
 
-    await handleResponse3(chatId);// agora ele não deleta o userstate, mantendo o fluxo
+    await handleResponse3(chatId); // mantém o fluxo
 };
 
 const handleResponse3 = async (chatId, response) => {
