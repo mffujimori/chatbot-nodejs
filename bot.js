@@ -56,7 +56,7 @@ const msg =
 Olá! 👋 Em que posso te ajudar hoje?
 
 🔥 *Confira nosso delicioso cardápio AGORA:* 🔥
-👉 [https://drive.google.com/file/d/1Eu8QEMeb1svPx3yK7uARRjHk3oedovzS/view] 👈
+👇 *ANEXO ABAIXO* 👇
 
 😋 *Já escolheu suas delícias?*
 
