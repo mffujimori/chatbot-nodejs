@@ -1,5 +1,6 @@
-const { Client } = require('whatsapp-web.js');
+const { Client, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const path = require('path');
 
 // Criação do cliente do WhatsApp
 const client = new Client();
@@ -13,6 +14,8 @@ client.on('qr', qr => {
 client.on('ready', () => {
     console.log('Client is ready!');
 });
+
+const media = MessageMedia.fromFilePath(path.join(__dirname, 'Cardápio Sabor Caseiro_1.png'));
 
 const cardapio = `
 🍽️ *CARDÁPIO - SABOR CASEIRO*  
@@ -75,6 +78,7 @@ client.on('message', async (message) => {
     // Verifica se o usuário já iniciou a interação ou não
     if (!userState[from]) {
         await client.sendMessage(from, msg);
+        await client.sendMessage(from, media);
         userState[from] = { step: 1 };
     }else if (userState[from].step === 1) {
         handleResponse1(from, body);
